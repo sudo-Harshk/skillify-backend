@@ -1,26 +1,16 @@
 const fastify = require('fastify')({ logger: true });
 const helmet = require('@fastify/helmet');  
 const cors = require('@fastify/cors');     
-const subjectsRoutes = require('./routes/subjects');
-const questionsRoutes = require('./routes/questions');
+const subjectsRoutes = require('../routes/subjects');
+const questionsRoutes = require('../routes/questions');
 
+// Register plugins
+fastify.register(helmet);
+fastify.register(cors);
 
-fastify.register(helmet); 
-fastify.register(cors);   
-
-
+// Register routes
 fastify.register(subjectsRoutes);
 fastify.register(questionsRoutes);
 
-
-const start = async () => {
-    try {
-        await fastify.listen({ port: 3000 });
-        fastify.log.info(`Server listening on http://localhost:3000`);
-    } catch (err) {
-        fastify.log.error(err);
-        process.exit(1);
-    }
-};
-
-start();
+// Export the Fastify instance for Vercel
+module.exports = fastify;

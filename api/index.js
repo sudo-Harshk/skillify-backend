@@ -16,7 +16,11 @@ fastify.get('/', async (request, reply) => {
         endpoints: [
             {
                 endpoint: '/subjects',
-                description: 'Retrieve information about various subjects'
+                description: 'Retrieve a list of all subjects'
+            },
+            {
+                endpoint: '/subjects/{subject}/chapters',
+                description: 'Retrieve chapter information for a specific subject (replace {subject} with a subject name)'
             },
             {
                 endpoint: '/questions',

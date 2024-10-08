@@ -20,5 +20,13 @@
     "axios": "^1.7.7",
     "dotenv": "^16.4.5",
     "fastify": "^5.0.0"
+  },
+  "vercel": {
+    "functions": {
+      "api/index.js": {
+        "memory": 128,
+        "maxDuration": 10
+      }
+    }
   }
 }

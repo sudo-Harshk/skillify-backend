@@ -39,14 +39,14 @@ async function routes(fastify, options) {
                 console.warn('Incomplete MCQ format detected');
                 return null;
               }
-              const question = lines[0].replace('Question: ', '').trim();
+              const question = lines[0].replace(/\*\*|Question:|\d+\.\s*/g, '').trim();
               const options = lines.slice(1, 5).map((line, idx) => ({
                 label: String.fromCharCode(97 + idx), // Convert index to a, b, c, d
                 option: line.replace(`(${String.fromCharCode(97 + idx)})`, '').trim()
               }));
-              const correctAnswerLine = lines[5]?.replace('Correct Answer: ', '').trim();
+              const correctAnswerLine = lines[5]?.replace(/\*\*|Correct Answer:/g, '').trim();
               const correctAnswers = correctAnswerLine?.match(/\((.)\)/g)?.map(match => match[1]);
-              const explanation = lines.length > 6 ? lines[6].replace('Explanation: ', '').trim() : "No explanation provided.";
+              const explanation = lines.length > 6 ? lines[6].replace(/\*\*|Explanation:/g, '').trim() : "No explanation provided.";
               return { question, options, correctAnswers, explanation };
             }).filter(q => q !== null);
 

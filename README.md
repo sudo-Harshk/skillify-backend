@@ -1,6 +1,6 @@
 # Skillify
 
-Skillify is a web application designed to help students practice for the JEE exam by generating unique multiple-choice questions (MCQs) based on selected subjects and chapters.
+Skillify is a web application designed to help students practice for the Btech based competative exams by generating unique multiple-choice questions (MCQs) based on selected subjects and chapters.
 
 ## Purpose
 

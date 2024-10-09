@@ -5,7 +5,6 @@ module.exports = {
         "Complex Numbers",
         "Determinant",
         "Quadratic Equations",
-        "Matrices",
         "Permutations and Combinations",
         "Mathematical Induction",
         "Sequence and Series",

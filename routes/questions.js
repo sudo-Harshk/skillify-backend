@@ -5,8 +5,20 @@ dotenv.config();
 const genAI = new GoogleGenerativeAI(process.env.GENERATIVE_AI_KEY);
 let model;
 
+// Store generated questions for different subjects/chapters
+const questionHistory = {};
+
 // Function to generate unique questions with retries
-const generateUniqueQuestions = async (prompt, retries = 3) => {
+const generateUniqueQuestions = async (subject, chapter, prompt, retries = 3) => {
+  if (!questionHistory[subject]) {
+    questionHistory[subject] = {};
+  }
+  if (!questionHistory[subject][chapter]) {
+    questionHistory[subject][chapter] = [];
+  }
+
+  const previousQuestions = questionHistory[subject][chapter];
+
   let uniqueQuestions = [];
   let attempts = 0;
 
@@ -40,11 +52,11 @@ const generateUniqueQuestions = async (prompt, retries = 3) => {
             return { question, options, correctAnswers, explanation };
           }).filter(q => q !== null);
 
-          formattedQuestions.forEach((q) => {
-            if (!uniqueQuestions.some(existingQuestion => existingQuestion.question === q.question)) {
-              uniqueQuestions.push(q);
-            }
-          });
+          const nonDuplicateQuestions = formattedQuestions.filter(
+            (q) => !previousQuestions.some((pq) => pq.question === q.question)
+          );
+
+          uniqueQuestions.push(...nonDuplicateQuestions);
         }
       }
     } catch (error) {
@@ -58,6 +70,7 @@ const generateUniqueQuestions = async (prompt, retries = 3) => {
     throw new Error('Failed to generate 10 unique questions after multiple attempts.');
   }
 
+  questionHistory[subject][chapter].push(...uniqueQuestions);
   return uniqueQuestions;
 };
 
@@ -74,7 +87,9 @@ async function routes(fastify, options) {
   fastify.post('/questions/generate', async (request, reply) => {
     const { subject, chapter } = request.body;
 
-    const prompt = `Generate 10 multiple-choice questions for the chapter "${chapter}" in ${subject}. Each question should have four options labeled (a), (b), (c), and (d), with one or more correct answers indicated. Each question should also include a detailed explanation (2-3 lines) for the answer. Format each question like the following example:
+    const difficultyLevels = ['easy', 'medium', 'hard'];
+    const difficulty = difficultyLevels[Math.floor(Math.random() * difficultyLevels.length)];
+    const prompt = `Generate 10 multiple-choice questions for the chapter "${chapter}" in ${subject}. These questions should be of "${difficulty}" difficulty. Ensure these questions cover different aspects of the chapter and do not repeat previously generated questions. Each question should have four options labeled (a), (b), (c), and (d), with one or more correct answers indicated. Each question should also include a detailed explanation (2-3 lines) for the answer. Format each question like the following example:
 
     What is the sum of 2 + 2?
     (a) 1
@@ -94,7 +109,7 @@ async function routes(fastify, options) {
       }
 
       // Generate unique questions
-      const questions = await generateUniqueQuestions(prompt);
+      const questions = await generateUniqueQuestions(subject, chapter, prompt);
       console.log("Generated Questions:", questions);
 
       // Store questions in a temporary in-memory storage

@@ -76,7 +76,7 @@ async function routes(fastify, options) {
 
     const prompt = `Generate 10 multiple-choice questions for the chapter "${chapter}" in ${subject}. Each question should have four options labeled (a), (b), (c), and (d), with one or more correct answers indicated. Each question should also include a detailed explanation (2-3 lines) for the answer. Format each question like the following example:
 
-    Question: What is the sum of 2 + 2?
+    What is the sum of 2 + 2?
     (a) 1
     (b) 2
     (c) 3

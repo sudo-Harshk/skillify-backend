@@ -75,17 +75,23 @@ async function routes(fastify, options) {
   fastify.post('/questions/generate', async (request, reply) => {
     const { subject, chapter } = request.body;
 
-    const prompt = `Generate 10 multiple-choice questions for the chapter "${chapter}" in ${subject}. Each question should have four options labeled (a), (b), (c), and (d), with one or more correct answers indicated. Each question should also include a detailed explanation (2-3 lines) for the answer. Format each question like the following example:
+    const prompt = `Generate 10 multiple-choice questions for the chapter "${chapter}" in ${subject}. Each question should:
+    1. Be clear and concise
+    2. Have four options labeled (a), (b), (c), and (d)
+    3. Have one or more correct answers indicated
+    4. Include a detailed explanation (2-3 lines) for the answer
+    5. Cover different difficulty levels
+    6. Test different aspects of the topic
 
-    Question: What is the sum of 2 + 2?
+    Format each question exactly like this example:
+
+    What is the sum of 2 + 2?
     (a) 1
     (b) 2
     (c) 3
     (d) 4
-    Correct Answer: (d)
-    Explanation: The sum of 2 and 2 is 4, which is obtained by adding both numbers together.
-
-    Ensure that each question follows this format.`;
+    Answer: d
+    Explanation: The sum of 2 and 2 is 4.`;
 
     try {
       console.log("Prompt:", prompt);

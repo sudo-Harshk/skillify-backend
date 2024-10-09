@@ -1,3 +1,5 @@
+// routes/subjects.js
+
 const subjectsData = require('../data/subjects');
 
 async function routes(fastify, options) {

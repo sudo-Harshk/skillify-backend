@@ -15,6 +15,27 @@ async function routes(fastify, options) {
     return;
   }
 
+  // Retry mechanism for question generation
+  const generateQuestionsWithRetry = async (prompt, retries = 3) => {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const result = await model.generateContent(prompt);
+        const candidates = result?.response?.candidates;
+
+        if (Array.isArray(candidates) && candidates.length > 0) {
+          const questionsText = candidates[0]?.content?.parts?.[0]?.text;
+
+          if (typeof questionsText === 'string' && questionsText.trim().length > 0) {
+            return questionsText;
+          }
+        }
+      } catch (error) {
+        console.error(`Attempt ${i + 1} failed:`, error);
+      }
+    }
+    throw new Error('Failed to generate questions after multiple attempts.');
+  };
+
   // Route to generate questions
   fastify.post('/questions/generate', async (request, reply) => {
     const { subject, chapter } = request.body;
@@ -38,28 +59,13 @@ async function routes(fastify, options) {
         throw new Error("Model not initialized correctly.");
       }
 
-      const result = await model.generateContent(prompt);
-      
-      // Log the result to understand its structure
-      console.log("Result:", JSON.stringify(result, null, 2));
-
-      const candidates = result?.response?.candidates;
-
-      if (!Array.isArray(candidates) || candidates.length === 0) {
-        throw new Error("The response does not contain valid candidates.");
-      }
-
-      const questionsText = candidates[0]?.content?.parts?.[0]?.text;
-
-      // Update this part to handle unexpected structure
-      if (typeof questionsText !== 'string') {
-        console.error("Unexpected response structure. Full response:", JSON.stringify(result, null, 2));
-        throw new Error("The response content is not a string.");
-      }
-
-      const questionsArray = questionsText.split('\n\n').filter(q => q.trim().length > 0);
+      // Generate questions with retries
+      const questionsText = await generateQuestionsWithRetry(prompt);
+      console.log("Generated Questions:", questionsText);
 
       // Process the questions into the desired MCQ format
+      const questionsArray = questionsText.split('\n\n').filter(q => q.trim().length > 0);
+
       const formattedQuestions = questionsArray.map((questionText) => {
         const lines = questionText.split('\n').filter(line => line.trim().length > 0);
 
@@ -88,6 +94,10 @@ async function routes(fastify, options) {
           explanation
         };
       }).filter(q => q !== null);
+
+      if (!formattedQuestions || formattedQuestions.length === 0) {
+        throw new Error("Failed to generate a valid set of questions.");
+      }
 
       // Store questions in a temporary in-memory storage
       fastify.generatedQuestions = formattedQuestions;

@@ -5,15 +5,25 @@ async function routes(fastify, options) {
         return Object.keys(subjectsData);
     });
 
-    
     fastify.get('/subjects/:subject/chapters', async (request, reply) => {
         const { subject } = request.params;
-        const chapters = subjectsData[subject];
 
-        if (!chapters) {
+        // Convert subject name to lowercase to avoid case-sensitive issues
+        const normalizedSubject = subject.toLowerCase();
+        const availableSubjects = Object.keys(subjectsData).map(s => s.toLowerCase());
+
+        if (!availableSubjects.includes(normalizedSubject)) {
+            return reply.status(404).send({ message: 'Subject not found' });
+        }
+
+        // Find the correct subject from the original data
+        const originalSubject = Object.keys(subjectsData).find(s => s.toLowerCase() === normalizedSubject);
+        const chapters = subjectsData[originalSubject];
+
+        if (!chapters || chapters.length === 0) {
             return reply.status(404).send({ message: 'Chapters not found' });
         }
-        
+
         return chapters;
     });
 }

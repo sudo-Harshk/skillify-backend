@@ -87,27 +87,26 @@ async function routes(fastify, options) {
   fastify.post('/questions/generate', async (request, reply) => {
     const { subject, chapter, examType } = request.body;
 
-  const difficultyLevels = {
-    'JEE Advanced': 'advanced',
-    'JEE Mains': 'intermediate',
-    'EAMCET': 'basic'
-  };
-
-  const difficulty = difficultyLevels[examType];
-
-  const prompt = `Generate 10 multiple-choice questions for the chapter "${chapter}" in ${subject} for the ${examType} exam. These questions should be of "${difficulty}" difficulty, tailored to the format of the ${examType} exam. Ensure these questions cover different aspects of the chapter and do not repeat previously generated questions. Each question should have four options labeled (a), (b), (c), and (d), with one or more correct answers clearly indicated. Each question should also include a detailed explanation (2-3 lines) explaining the correct answer and the reasoning behind it. Format each question like the following example:
-
-    Example:
-    What is the sum of 2 + 2?
-    (a) 1
-    (b) 2
-    (c) 3
-    (d) 4
-    Answer: (d)
-    Explanation: The sum of 2 and 2 is 4, derived by adding the two numbers together.
-
-    Ensure that each question follows this format and aligns with the difficulty and expectations of the ${examType} exam.`;
-
+    const difficultyLevels = {
+        'JEE Advanced': 'complex, in-depth, conceptually challenging',
+        'JEE Mains': 'moderate, straightforward, conceptually clear'
+    };
+    
+    const difficulty = difficultyLevels[examType];
+    
+    const prompt = `Generate 10 multiple-choice questions for the chapter "${chapter}" in ${subject} for the ${examType} exam. These questions should be "${difficulty}" to align with the difficulty level expected in the ${examType} exam. Ensure these questions cover different aspects of the chapter, and do not repeat previously generated questions. Each question should have four options labeled (a), (b), (c), and (d), with one or more correct answers clearly indicated. Each question should also include a detailed explanation (2-3 lines) explaining the correct answer and the reasoning behind it. Format each question like the following example:
+    
+        Example:
+        What is the sum of 2 + 2?
+        (a) 1
+        (b) 2
+        (c) 3
+        (d) 4
+        Correct Answer: (d)
+        Explanation: The sum of 2 and 2 is 4, derived by adding the two numbers together.
+    
+        Ensure that each question follows this format and is aligned with the difficulty and expectations of the ${examType} exam. The questions should also emphasize concepts and problem-solving skills relevant to the given difficulty level, e.g., JEE Mains for conceptual clarity and straightforward questions, and JEE Advanced for complex problem-solving and in-depth understanding.`;
+    
     try {
       console.log("Prompt:", prompt);
 

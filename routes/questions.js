@@ -15,25 +15,60 @@ async function routes(fastify, options) {
     return;
   }
 
-  // Retry mechanism for question generation
-  const generateQuestionsWithRetry = async (prompt, retries = 3) => {
-    for (let i = 0; i < retries; i++) {
+  // Function to generate unique questions with retries
+  const generateUniqueQuestions = async (prompt, retries = 3) => {
+    let uniqueQuestions = [];
+    let attempts = 0;
+
+    while (uniqueQuestions.length < 10 && attempts < retries) {
+      const remainingQuestions = 10 - uniqueQuestions.length;
+      const currentPrompt = `${prompt} Generate ${remainingQuestions} additional questions.`;
+
       try {
-        const result = await model.generateContent(prompt);
+        const result = await model.generateContent(currentPrompt);
         const candidates = result?.response?.candidates;
 
         if (Array.isArray(candidates) && candidates.length > 0) {
           const questionsText = candidates[0]?.content?.parts?.[0]?.text;
 
           if (typeof questionsText === 'string' && questionsText.trim().length > 0) {
-            return questionsText;
+            const questionsArray = questionsText.split('\n\n').filter(q => q.trim().length > 0);
+            const formattedQuestions = questionsArray.map((questionText) => {
+              const lines = questionText.split('\n').filter(line => line.trim().length > 0);
+              if (lines.length < 6) {
+                console.warn('Incomplete MCQ format detected');
+                return null;
+              }
+              const question = lines[0].replace('Question: ', '').trim();
+              const options = lines.slice(1, 5).map((line, idx) => ({
+                label: String.fromCharCode(97 + idx), // Convert index to a, b, c, d
+                option: line.replace(`(${String.fromCharCode(97 + idx)})`, '').trim()
+              }));
+              const correctAnswerLine = lines[5]?.replace('Correct Answer: ', '').trim();
+              const correctAnswers = correctAnswerLine?.match(/\((.)\)/g)?.map(match => match[1]);
+              const explanation = lines.length > 6 ? lines[6].replace('Explanation: ', '').trim() : "No explanation provided.";
+              return { question, options, correctAnswers, explanation };
+            }).filter(q => q !== null);
+
+            formattedQuestions.forEach((q) => {
+              if (!uniqueQuestions.some(existingQuestion => existingQuestion.question === q.question)) {
+                uniqueQuestions.push(q);
+              }
+            });
           }
         }
       } catch (error) {
-        console.error(`Attempt ${i + 1} failed:`, error);
+        console.error(`Attempt ${attempts + 1} failed:`, error);
       }
+
+      attempts += 1;
     }
-    throw new Error('Failed to generate questions after multiple attempts.');
+
+    if (uniqueQuestions.length < 10) {
+      throw new Error('Failed to generate 10 unique questions after multiple attempts.');
+    }
+
+    return uniqueQuestions;
   };
 
   // Route to generate questions
@@ -59,50 +94,11 @@ async function routes(fastify, options) {
         throw new Error("Model not initialized correctly.");
       }
 
-      // Generate questions with retries
-      const questionsText = await generateQuestionsWithRetry(prompt);
-      console.log("Generated Questions:", questionsText);
+      // Generate unique questions
+      const questions = await generateUniqueQuestions(prompt);
+      console.log("Generated Questions:", questions);
 
-      // Process the questions into the desired MCQ format
-      const questionsArray = questionsText.split('\n\n').filter(q => q.trim().length > 0);
-
-      const formattedQuestions = questionsArray.map((questionText) => {
-        const lines = questionText.split('\n').filter(line => line.trim().length > 0);
-
-        if (lines.length < 6) {
-          console.warn('Incomplete MCQ format detected');
-          return null;
-        }
-
-        const question = lines[0].replace('Question: ', '').trim();
-        const options = lines.slice(1, 5).map((line, idx) => ({
-          label: String.fromCharCode(97 + idx), // Convert index to a, b, c, d
-          option: line.replace(`(${String.fromCharCode(97 + idx)})`, '').trim()
-        }));
-
-        // Extract correct answer labels (e.g., 'a', 'b', 'c', 'd')
-        const correctAnswerLine = lines[5]?.replace('Correct Answer: ', '').trim();
-        const correctAnswers = correctAnswerLine?.match(/\((.)\)/g)?.map(match => match[1]);
-
-        // Extract detailed explanation
-        const explanation = lines.length > 6 ? lines[6].replace('Explanation: ', '').trim() : "No explanation provided.";
-
-        return {
-          question,
-          options,
-          correctAnswers,
-          explanation
-        };
-      }).filter(q => q !== null);
-
-      if (!formattedQuestions || formattedQuestions.length === 0) {
-        throw new Error("Failed to generate a valid set of questions.");
-      }
-
-      // Store questions in a temporary in-memory storage
-      fastify.generatedQuestions = formattedQuestions;
-
-      return reply.code(201).send({ questions: formattedQuestions });
+      return reply.code(201).send({ questions });
     } catch (error) {
       console.error('Error generating questions:', error);
       return reply.status(500).send({ message: 'Error generating questions', error: error.message });

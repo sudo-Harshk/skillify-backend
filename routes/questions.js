@@ -85,21 +85,28 @@ async function routes(fastify, options) {
 
   // Route to generate questions
   fastify.post('/questions/generate', async (request, reply) => {
-    const { subject, chapter } = request.body;
+    const { subject, chapter, examType } = request.body;
 
-    const difficultyLevels = ['easy', 'medium', 'hard'];
-    const difficulty = difficultyLevels[Math.floor(Math.random() * difficultyLevels.length)];
-    const prompt = `Generate 10 multiple-choice questions for the chapter "${chapter}" in ${subject}. These questions should be of "${difficulty}" difficulty. Ensure these questions cover different aspects of the chapter and do not repeat previously generated questions. Each question should have four options labeled (a), (b), (c), and (d), with one or more correct answers indicated. Each question should also include a detailed explanation (2-3 lines) for the answer. Format each question like the following example:
+  const difficultyLevels = {
+    'JEE Advanced': 'advanced',
+    'JEE Mains': 'intermediate',
+    'EAMCET': 'basic'
+  };
 
+  const difficulty = difficultyLevels[examType];
+
+  const prompt = `Generate 10 multiple-choice questions for the chapter "${chapter}" in ${subject} for the ${examType} exam. These questions should be of "${difficulty}" difficulty, tailored to the format of the ${examType} exam. Ensure these questions cover different aspects of the chapter and do not repeat previously generated questions. Each question should have four options labeled (a), (b), (c), and (d), with one or more correct answers clearly indicated. Each question should also include a detailed explanation (2-3 lines) explaining the correct answer and the reasoning behind it. Format each question like the following example:
+
+    Example:
     What is the sum of 2 + 2?
     (a) 1
     (b) 2
     (c) 3
     (d) 4
-    Correct Answer: (d)
-    Explanation: The sum of 2 and 2 is 4, which is obtained by adding both numbers together.
+    Answer: (d)
+    Explanation: The sum of 2 and 2 is 4, derived by adding the two numbers together.
 
-    Ensure that each question follows this format.`;
+    Ensure that each question follows this format and aligns with the difficulty and expectations of the ${examType} exam.`;
 
     try {
       console.log("Prompt:", prompt);

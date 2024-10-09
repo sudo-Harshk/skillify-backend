@@ -102,7 +102,7 @@ async function routes(fastify, options) {
         (b) 2
         (c) 3
         (d) 4
-        Correct Answer: (d)
+        Answer: (d)
         Explanation: The sum of 2 and 2 is 4, derived by adding the two numbers together.
     
         Ensure that each question follows this format and is aligned with the difficulty and expectations of the ${examType} exam. The questions should also emphasize concepts and problem-solving skills relevant to the given difficulty level, e.g., JEE Mains for conceptual clarity and straightforward questions, and JEE Advanced for complex problem-solving and in-depth understanding.`;

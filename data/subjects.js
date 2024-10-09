@@ -23,7 +23,6 @@ module.exports = {
         "Probability"
     ],
     Chemistry: [
-        "Basic Concepts in Chemistry",
         "States of Matter",
         "Chemical Bonding",
         "Atomic Structure",
@@ -54,7 +53,7 @@ module.exports = {
         "Isolation of Metals"
     ],
     Physics: [
-        "Physics and Measurement",
+        "Units and Measurement",
         "Thermodynamics",
         "Kinematics",
         "Rotational Motion",

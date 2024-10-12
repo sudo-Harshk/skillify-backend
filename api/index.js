@@ -1,15 +1,25 @@
 const fastify = require('fastify')({ logger: true });
-const helmet = require('@fastify/helmet');  
-const cors = require('@fastify/cors');     
+const helmet = require('@fastify/helmet');
+const cors = require('@fastify/cors');
 const subjectsRoutes = require('../routes/subjects');
 const questionsRoutes = require('../routes/questions');
 
-fastify.register(helmet); 
-fastify.register(cors);   
+// Register Helmet for basic security best practices
+fastify.register(helmet);
 
+// Register CORS with the required configuration
+fastify.register(cors, {
+    origin: ['https://sudo-harshk.github.io'], // Allow requests from your frontend domain
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Allow these headers in CORS requests
+    credentials: true // If you need cookies or authentication headers, set this to true
+});
+
+// Register your routes
 fastify.register(subjectsRoutes);
 fastify.register(questionsRoutes);
 
+// Root endpoint with API info
 fastify.get('/', async (request, reply) => {
     reply.send({
         message: 'Welcome to the Skillify API!',
@@ -31,9 +41,10 @@ fastify.get('/', async (request, reply) => {
     });
 });
 
+// Start the server
 const start = async () => {
     try {
-        await fastify.listen({ port: 3000 });
+        await fastify.listen({ port: 3000, host: '0.0.0.0' }); // host set to '0.0.0.0' to allow connections from Vercel or other remote locations
         fastify.log.info(`Server listening on http://localhost:3000`);
     } catch (err) {
         fastify.log.error(err);

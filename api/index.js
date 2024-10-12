@@ -9,10 +9,10 @@ fastify.register(helmet);
 
 // Register CORS with the required configuration
 fastify.register(cors, {
-    origin: 'https://sudo-harshk.github.io', // Allow requests from your frontend domain
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed HTTP methods
-    allowedHeaders: ['Content-Type', 'Authorization'], // Allow these headers in CORS requests
-    credentials: true // Allow cookies and authentication headers if required
+    origin: 'https://sudo-harshk.github.io', 
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
+    allowedHeaders: ['Content-Type', 'Authorization'], 
+    credentials: true 
 });
 
 // Register your routes after CORS registration

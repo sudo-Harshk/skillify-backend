@@ -4,18 +4,18 @@ const cors = require('@fastify/cors');
 const subjectsRoutes = require('../routes/subjects');
 const questionsRoutes = require('../routes/questions');
 
-// Register Helmet for basic security best practices
+// Register Helmet for security
 fastify.register(helmet);
 
-// Register CORS with the required configuration
+// Register CORS with credentials allowed
 fastify.register(cors, {
-    origin: 'https://sudo-harshk.github.io', 
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
-    allowedHeaders: ['Content-Type', 'Authorization'], 
-    credentials: true 
+    origin: 'https://sudo-harshk.github.io', // Frontend GitHub Pages URL
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true // Allows cookies to be included in requests
 });
 
-// Register your routes after CORS registration
+// Register routes after CORS configuration
 fastify.register(subjectsRoutes);
 fastify.register(questionsRoutes);
 

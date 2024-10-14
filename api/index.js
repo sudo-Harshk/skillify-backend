@@ -10,7 +10,8 @@ fastify.register(cors, {
     origin: (origin, callback) => {
         const allowedOrigins = [
             'https://sudo-harshk.github.io',
-            'http://localhost:3000'
+            'http://localhost:3000',
+            'http://192.168.0.105:3000' 
         ];
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);

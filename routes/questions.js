@@ -97,14 +97,14 @@ async function routes(fastify, options) {
     const prompt = `Generate 10 multiple-choice questions for the chapter "${chapter}" in ${subject} for the ${examType} exam. These questions should be "${difficulty}" to align with the difficulty level expected in the ${examType} exam. Ensure these questions cover different aspects of the chapter, and do not repeat previously generated questions. Each question should have four options labeled (a), (b), (c), and (d), with one or more correct answers clearly indicated. Each question should also include a detailed explanation (2-3 lines) explaining the correct answer and the reasoning behind it. Format each question like the following example:
     
         Example:
-        What is the sum of 2 + 2?
-        (a) 1
-        (b) 2
-        (c) 3
-        (d) 4
-        Answer: (d)
-        Explanation: The sum of 2 and 2 is 4, derived by adding the two numbers together.
-    
+        A ball is thrown vertically upwards with an initial velocity of 20 m/s. What will be the maximum height reached by the ball? Assume no air resistance and that the acceleration due to gravity is 9.8 m/s².**
+        (a) 10.2 m  
+        (b) 20.4 m  
+        (c) 30.6 m  
+        (d) 40.8 m  
+        Answer: (b)  
+        Explanation: Using the formula for vertical motion, v² = u² - 2gh, where v is the final velocity (0 at max height), u is the initial velocity, and g is the acceleration due to gravity, the maximum height reached by the ball is calculated as h = u² / (2g).
+           
         Ensure that each question follows this format and is aligned with the difficulty and expectations of the ${examType} exam. The questions should also emphasize concepts and problem-solving skills relevant to the given difficulty level, e.g., JEE Mains for conceptual clarity and straightforward questions, and JEE Advanced for complex problem-solving and in-depth understanding.`;
     
     try {

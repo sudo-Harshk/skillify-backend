@@ -103,8 +103,7 @@ async function routes(fastify, options) {
         (c) 30.6 m  
         (d) 40.8 m  
         Answer: (b)  
-        Explanation: Using the formula for vertical motion, v² = u² - 2gh, where v is the final velocity (0 at max height), u is the initial velocity, and g is the acceleration due to gravity, the maximum height reached by the ball is calculated as h = u² / (2g).
-           
+        Explanation: Using the formula for vertical motion, v² = u² - 2gh, where v is the final velocity (0 at max height), u is the initial velocity, and g is the acceleration due to gravity, the maximum height reached by the ball is calculated as h = u² / (2g).   
         Ensure that each question follows this format and is aligned with the difficulty and expectations of the ${examType} exam. The questions should also emphasize concepts and problem-solving skills relevant to the given difficulty level, e.g., JEE Mains for conceptual clarity and straightforward questions, and JEE Advanced for complex problem-solving and in-depth understanding.`;
     
     try {

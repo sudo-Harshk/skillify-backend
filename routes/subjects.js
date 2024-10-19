@@ -1,5 +1,3 @@
-// routes/subjects.js
-
 const subjectsData = require('../data/subjects');
 
 async function routes(fastify, options) {
@@ -10,7 +8,6 @@ async function routes(fastify, options) {
     fastify.get('/subjects/:subject/chapters', async (request, reply) => {
         const { subject } = request.params;
 
-        // Convert subject name to lowercase to avoid case-sensitive issues
         const normalizedSubject = subject.toLowerCase();
         const availableSubjects = Object.keys(subjectsData).map(s => s.toLowerCase());
 
@@ -18,7 +15,6 @@ async function routes(fastify, options) {
             return reply.status(404).send({ message: 'Subject not found' });
         }
 
-        // Find the correct subject from the original data
         const originalSubject = Object.keys(subjectsData).find(s => s.toLowerCase() === normalizedSubject);
         const chapters = subjectsData[originalSubject];
 

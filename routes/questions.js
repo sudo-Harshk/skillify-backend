@@ -15,7 +15,7 @@ const generateUniqueQuestions = async (subject, chapter, prompt, retries = 3) =>
     questionHistory[subject][chapter] = [];
   }
 
-  const previousQuestions = questionHistory[subject][chapter];
+  const previousQuestions = questionHistory[subject][chapter]; 
 
   let uniqueQuestions = [];
   let attempts = 0;

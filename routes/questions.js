@@ -7,6 +7,7 @@ let model;
 
 const questionHistory = {};
 
+// Function to generate unique questions
 const generateUniqueQuestions = async (subject, chapter, prompt, retries = 3) => {
   if (!questionHistory[subject]) {
     questionHistory[subject] = {};
@@ -72,6 +73,9 @@ const generateUniqueQuestions = async (subject, chapter, prompt, retries = 3) =>
   return uniqueQuestions;
 };
 
+// Helper function to add delay
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 async function routes(fastify, options) {
   try {
     model = await genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -81,6 +85,7 @@ async function routes(fastify, options) {
     throw error;
   }
 
+  // Route for generating questions
   fastify.post('/questions/generate', async (request, reply) => {
     const { subject, chapter, examType } = request.body;
 
@@ -102,7 +107,7 @@ async function routes(fastify, options) {
         Answer: (b)  
         Explanation: Using the formula for vertical motion, v² = u² - 2gh, where v is the final velocity (0 at max height), u is the initial velocity, and g is the acceleration due to gravity, the maximum height reached by the ball is calculated as h = u² / (2g).   
         Ensure that each question follows this format and is aligned with the difficulty and expectations of the ${examType} exam. The questions should also emphasize concepts and problem-solving skills relevant to the given difficulty level, e.g., JEE Mains for conceptual clarity and straightforward questions, and JEE Advanced for complex problem-solving and in-depth understanding.`;
-    
+
     try {
       console.log("Prompt:", prompt);
 
@@ -110,10 +115,12 @@ async function routes(fastify, options) {
         throw new Error("Model not initialized correctly.");
       }
 
+      // Start generating questions
       const questions = await generateUniqueQuestions(subject, chapter, prompt);
       console.log("Generated Questions:", questions);
 
-      fastify.generatedQuestions = questions;
+      // Introduce a 20-second delay before sending the response
+      await delay(20000);
 
       return reply.code(201).send({ questions });
     } catch (error) {
@@ -122,6 +129,7 @@ async function routes(fastify, options) {
     }
   });
 
+  // Route for evaluating user answers
   fastify.post('/questions/evaluate', async (request, reply) => {
     const { userAnswers } = request.body; 
 

@@ -87,16 +87,9 @@ async function routes(fastify, options) {
 
   // Route for generating questions
   fastify.post('/questions/generate', async (request, reply) => {
-    const { subject, chapter, examType } = request.body;
+    const { subject, chapter } = request.body;
 
-    const difficultyLevels = {
-        'JEE Advanced': 'complex, in-depth, conceptually challenging',
-        'JEE Mains': 'moderate, straightforward, conceptually clear'
-    };
-    
-    const difficulty = difficultyLevels[examType];
-    
-    const prompt = `Generate 10 multiple-choice questions for the chapter "${chapter}" in ${subject} for the ${examType} exam. These questions should be "${difficulty}" to align with the difficulty level expected in the ${examType} exam. Ensure these questions cover different aspects of the chapter, and do not repeat previously generated questions. Each question should have four options labeled (a), (b), (c), and (d), with one or more correct answers clearly indicated. Each question should also include a detailed explanation (2-3 lines) explaining the correct answer and the reasoning behind it. Format each question like the following example:
+    const prompt = `Generate 10 multiple-choice questions for the chapter "${chapter}" in ${subject}. Each question should have four options labeled (a), (b), (c), and (d), with one or more correct answers clearly indicated. Each question should also include a detailed explanation (2-3 lines) explaining the correct answer and the reasoning behind it. Format each question like the following example:
     
         Example:
         A ball is thrown vertically upwards with an initial velocity of 20 m/s. What will be the maximum height reached by the ball? Assume no air resistance and that the acceleration due to gravity is 9.8 m/s².
@@ -106,7 +99,7 @@ async function routes(fastify, options) {
         (d) 40.8 m  
         Answer: (b)  
         Explanation: Using the formula for vertical motion, v² = u² - 2gh, where v is the final velocity (0 at max height), u is the initial velocity, and g is the acceleration due to gravity, the maximum height reached by the ball is calculated as h = u² / (2g).   
-        Ensure that each question follows this format and is aligned with the difficulty and expectations of the ${examType} exam. The questions should also emphasize concepts and problem-solving skills relevant to the given difficulty level, e.g., JEE Mains for conceptual clarity and straightforward questions, and JEE Advanced for complex problem-solving and in-depth understanding.`;
+        Ensure that each question follows this format and is aligned with the expectations of a comprehensive assessment. The questions should also emphasize concepts and problem-solving skills relevant to the subject.`;
 
     try {
       console.log("Prompt:", prompt);
@@ -138,8 +131,8 @@ async function routes(fastify, options) {
         throw new Error("Model not initialized correctly.");
       }
 
-      const generatedQuestions = fastify.generatedQuestions;
-      if (!generatedQuestions || generatedQuestions.length === 0) {
+      const generatedQuestions = questionHistory[subject]?.[chapter] || [];
+      if (generatedQuestions.length === 0) {
         throw new Error("No questions available for evaluation.");
       }
 

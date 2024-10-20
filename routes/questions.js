@@ -8,7 +8,7 @@ let model;
 const questionHistory = {};
 
 // Function to generate unique questions
-const generateUniqueQuestions = async (subject, chapter, prompt, retries = 3) => {
+const generateUniqueQuestions = async (subject, chapter, prompt, retries = 5) => {
   if (!questionHistory[subject]) {
     questionHistory[subject] = {};
   }
@@ -66,7 +66,7 @@ const generateUniqueQuestions = async (subject, chapter, prompt, retries = 3) =>
   }
 
   if (uniqueQuestions.length < 10) {
-    throw new Error('Failed to generate 10 unique questions after multiple attempts.');
+    console.warn('Unable to generate 10 unique questions, returning partial result.');
   }
 
   questionHistory[subject][chapter].push(...uniqueQuestions);
@@ -112,9 +112,6 @@ async function routes(fastify, options) {
       const questions = await generateUniqueQuestions(subject, chapter, prompt);
       console.log("Generated Questions:", questions);
 
-      // Introduce a 20-second delay before sending the response
-      await delay(20000);
-
       return reply.code(201).send({ questions });
     } catch (error) {
       console.error('Error generating questions:', error);
@@ -124,7 +121,7 @@ async function routes(fastify, options) {
 
   // Route for evaluating user answers
   fastify.post('/questions/evaluate', async (request, reply) => {
-    const { userAnswers } = request.body; 
+    const { userAnswers, subject, chapter } = request.body; 
 
     try {
       if (!model) {
